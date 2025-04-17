@@ -128,6 +128,10 @@ def product_recommendation(products_df, ratings_df):
     user_mapping = meta["user_mapping"]
     product_mapping = meta["product_mapping"]
     mu = meta["mu"]
+    my_dict = list(model_cb["cosine_similarity"].items())
+    unique_ids = sorted([x[0] for x in my_dict])[:500]
+    user_map_df = ratings_df[['user_id', 'user']].drop_duplicates()
+    user_map = dict(zip(user_map_df['user_id'], user_map_df['user']))
 
     if method == "Gợi ý theo nội dung":
         search_mode = st.radio("Chọn cách tìm kiếm:", ["Từ khóa", "Mã sản phẩm"])
@@ -139,9 +143,6 @@ def product_recommendation(products_df, ratings_df):
                 display_recommendations(result, is_cb=True)
 
         elif search_mode == "Mã sản phẩm":
-            my_dict = list(model_cb["cosine_similarity"].items())
-            unique_ids = [x[0] for x in my_dict]
-
             product_id = st.selectbox("Chọn mã sản phẩm:", unique_ids)
 
             if st.button("Gợi ý", key="btn_cb_product"):
@@ -158,9 +159,6 @@ def product_recommendation(products_df, ratings_df):
                     st.error(f"Lỗi: {e}")
 
     elif method == "Gợi ý theo người dùng":
-        user_map_df = ratings_df[['user_id', 'user']].drop_duplicates()
-        user_map = dict(zip(user_map_df['user_id'], user_map_df['user']))
-
         st.subheader("👥 Danh sách người dùng và mã ID")
         st.dataframe(user_map_df.reset_index(drop=True), use_container_width=True)
         
